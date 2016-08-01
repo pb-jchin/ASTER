@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<link
+    href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.0.min.css"
+    rel="stylesheet" type="text/css">
+<link
+    href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.0.min.css"
+    rel="stylesheet" type="text/css">
+
+<script src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.0.min.js"></script>
+<script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.0.min.js"></script>
+
+<script src="../view/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="../view/node_modules/vivagraphjs/dist/vivagraph.min.js"></script>
+
+<link rel="stylesheet" src="../view/node_modules/bootstrap/dist/css/bootstrap.css">
+<link href="../view/node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+<link href="../view/node_modules/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet">
+
+
+
+<script src="./comm.js"></script>
+<script src="./graph_ctrl.js"> </script>
+
+<link href="sticky-footer-navbar.css" rel="stylesheet">
+
+<style>
+svg { width: 800px; height: 600px; } 
+</style>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">ASTER</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a data-toggle="modal" data-target="#aboutModal">About</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">ASTER</h4>
+          </div>
+          <div class="modal-body">
+            ASTER: Assembly STring graph ExploreR <br>
+            ASTER is a tool for examing reads in a genome assembly and its 
+            local string sub-graph.
+          </div>
+          <div class="modal-footer">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <ul class="nav nav-pills">
+                    <li class="active"><a data-toggle="tab" href="#dotplot">Dot Plot</a></li>
+                    <li><a data-toggle="tab" href="#asmgraph">Assembly Graph </a></li>
+                </ul>
+                <div class="tab-content">
+                  <div id="dotplot" class="tab-pane fade in active">
+                      <div id="dotplotarea">choose a read in IGV, right click, choose ExtView</div>
+                  </div>
+                  <div id="asmgraph" class="tab-pane fade">
+                      <div id="asmgrapharea"></div>
+                  </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div id="r-sidebar">
+                  (A) Selected Read From IGV:
+                  <div class="panel panel-default">
+                    <div id="read-detail" class="panel-body">
+                       choose a read in IGV, right click, choose ExtView
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-default btn-sm" onclick="showLocalGraph(curReadID);" >Show Local Graph</button>
+                  <hr>
+                  (B) Enter Specific Read ID:
+                  <div>
+                      <div class="input-group">
+                          <input class="form-control" id="n_input" placeholder="Enter a read ID" style="width:180px"> 
+                          <button type="button" class="btn btn-default btn-sm" onclick='showLocalGraph(document.getElementById("n_input").value)'>get graph</button></div>
+                      </div>
+                  <hr>
+                  Node/Edge data:
+                  <div class="panel panel-default">
+                      <div id="ctgname"> Click the nodes or edges to show information here</div>
+                  </div>
+                  <div class="dropdown">
+                      <button class="btn btn-default dropdown-toggle" type="button" id="DDctglist" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                      Contig in the Graph
+                      <span class="caret"></span>
+                      </button>
+                      <ul id="ctglist" class="dropdown-menu" aria-labelledby="DDctglist" style="overflow-y: scroll; height: 320px;">
+                      </ul>
+                  </dvi>
+                </div>
+            </div>
+        </div>
+     </div>
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted">ASTER, Alpha, JC, 2016</p>
+      </div>
+    </footer>
+  </body>
+</html>
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="../view/node_modules/bootstrap/dist/js/bootstrap.js"></script>
