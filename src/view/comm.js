@@ -20,12 +20,12 @@ ws.onopen = function() {
   //ws.send("Hello, world");
 };
 
-ws.onmessage = function (evt) {
+ws.onmessage = function(evt) {
   var js = JSON.parse(evt.data);
   if (js["msg"] == "dot_plot") {
     var script = js["script"];
     div = js["div"];
-    plot_area=document.getElementById("dotplotarea");
+    plot_area = document.getElementById("dotplotarea");
     plot_area.innerHTML = div;
     evalJSFromHtml(script);
     read_info = js["read_info"];
@@ -33,22 +33,28 @@ ws.onmessage = function (evt) {
     read_len = read_info["len"];
     read_map = read_info["map"];
     curReadID = read_name;
-    document.getElementById("read-detail").innerHTML = 
-        "name: " + read_name + "<br>" + 
-        "len: " + read_len + "<br>" +
-        "mapped location: " + read_map;
+    document.getElementById("read-detail").innerHTML =
+      "name: " + read_name + "<br>" +
+      "len: " + read_len + "<br>" +
+      "mapped location: " + read_map;
 
   } else if (js["msg"] == "asm_graph_plot") {
-    plot_area=document.getElementById("dotplotarea");
+    plot_area = document.getElementById("dotplotarea");
     div = js["div"];
     plot_area.innerHTML = div;
   }
   $("[href='#dotplot']").tab("show")
-}; 
+};
 
 var showLocalGraph = function(node_name) {
-  var data = {"v":node_name+":E", "layers":60, "max_nodes":1200};
+  var data = {
+    "v": node_name + ":E",
+    "layers": 60,
+    "max_nodes": 3600
+  };
   $("[href='#asmgraph']").tab("show")
   $.post("http://localhost:6502/ShowLocalSG/", data,
-      function( g ) {renderAsmGraph(g);});
+    function(g) {
+      renderAsmGraph(g);
+    });
 }
