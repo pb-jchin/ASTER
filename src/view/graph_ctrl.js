@@ -14,7 +14,13 @@ var renderAsmGraph = function(graph_data) {
 
   g_links = graph_data["links"];
   g_node_to_ctg = graph_data["node_to_ctg"];
+  node_size = graph_data["node_size"];
   var center_node = graph_data["center_node"];
+  var center_read = center_node.split(":")[0];
+  var c_node_B = center_read + ":B";
+  var c_node_E = center_read + ":E";
+  
+
 
   for (i = 0; i < g_links.length; i++) {
 
@@ -71,10 +77,17 @@ var renderAsmGraph = function(graph_data) {
       fill_color = "#00F";
     }
 
-    if (node.id == center_node) {
-      nsize = nsize * 4;
-      fill_color = "#000";
+    if (node.id == c_node_B) {
+      nsize = nsize * 8;
+      fill_color = "#0F0";
     }
+
+    if (node.id == c_node_E) {
+      nsize = nsize * 8;
+      fill_color = "#00F";
+    }
+
+    nsize = node_size[ node.id ];
 
     var ui = Viva.Graph.svg("circle")
       .attr("cx", 0)
@@ -100,7 +113,7 @@ var renderAsmGraph = function(graph_data) {
     if (link.data.ctg != "r") {
       ui.attr('marker-end', 'url(#Triangle)');
     } else {
-      ui.attr('stroke', '#CCC');
+      ui.attr('stroke', link.data["color"]);
     }
     ui.addEventListener("click", function() {
       document.getElementById("ctgname").innerHTML = link.fromId + " => " + link.toId;

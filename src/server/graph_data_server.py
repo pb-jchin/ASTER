@@ -20,15 +20,19 @@ def load_graph():
 
 def get_full_asm_G(G_asm):
     full_asm_G = nx.DiGraph()
+    readlength = {}
     for v, w in G_asm.sg_edges:
         edge_data = G_asm.sg_edges[(v, w)]
+        #if edge_data[-1] not in ["TR", "R"]:
         if edge_data[-1] == "G":
             full_asm_G.add_edge(v, w)
-    return full_asm_G
+        readlength[edge_data[0][0]] = abs(int(edge_data[0][1]) - int( edge_data[0][2])) + int( edge_data[1])
+    return full_asm_G, readlength
 
 class GraphDataServer(object):
     _G_asm = None
     _full_asm_G = None
+    _read_lengths = None
 
     def __init__(self):
         if GraphDataServer._G_asm == None:
@@ -36,7 +40,8 @@ class GraphDataServer(object):
         self.G_asm = GraphDataServer._G_asm
 
         if GraphDataServer._full_asm_G == None:
-            GraphDataServer._full_asm_G = get_full_asm_G(self.G_asm)
+            GraphDataServer._full_asm_G, GraphDataServer._read_lengths = get_full_asm_G(self.G_asm)
+
         self.full_asm_G = GraphDataServer._full_asm_G
 
     def get_sg_edge( self, v, w ):
@@ -161,7 +166,8 @@ class GraphData(tornado.web.RequestHandler):
             max_nodes = int(max_nodes)
             
             nodes = set()
-            edges = []
+            edges = set() 
+            read_length = {}
             
             vB = v.split(":")[0] + ":B"
             vE = v.split(":")[0] + ":E"
@@ -181,11 +187,19 @@ class GraphData(tornado.web.RequestHandler):
              
             for n in list(all_neighbor_nodes):
                 for v, w in gds.full_asm_G.out_edges(n):
-                    edges.append( (v, w) )
+                    edges.add( (v, w) )
                     nodes.add(v)
                     nodes.add(w)
 
-            rtn = {"nodes": tuple(nodes), "edges": edges}
+                for v, w in gds.full_asm_G.in_edges(n):
+                    edges.add( (v, w) )
+                    nodes.add(v)
+                    nodes.add(w)
+            for n in list(nodes):
+                n = n.split(":")[0]
+                read_length[n] = gds._read_lengths[n] 
+
+            rtn = {"nodes": tuple(nodes), "edges": tuple(edges), "read_length": read_length}
             self.write( json.dumps( rtn ) )
 
 

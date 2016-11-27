@@ -154,6 +154,7 @@ class ShowLocalSG(tornado.web.RequestHandler):
         g = get_local_sg(v, layers=layers, max_nodes=max_nodes)
         all_nodes = g["nodes"]
         all_edges = g["edges"]
+        all_length = g["read_length"]
         
         links = []
         node_ctg = {}
@@ -166,6 +167,7 @@ class ShowLocalSG(tornado.web.RequestHandler):
         
         ctg = "X"
         nodes = set()
+        node_size = {}
         for s, t in all_edges:
             ctg = set(node_ctg.get(s, set())) & set(node_ctg.get(t, set()))
             if len(ctg) >= 1:
@@ -174,13 +176,27 @@ class ShowLocalSG(tornado.web.RequestHandler):
                 ctg = "X"
 
             col = "#F44"
+            if all_length[s.split(":")[0]] < 10000 or all_length[t.split(":")[0]] < 10000:
+                col = "#EEE"
+
             links.append( (s, "x", t, col, ctg) )
             nodes.add(s.split(":")[0])
             nodes.add(t.split(":")[0])
+            node_size[s] = 2
+            node_size[t] = 2
 
         for n in list(nodes):
-            links.append( (n+":B", "x", n+":E", "white", "r") )
+            if all_length[n] > 20000: 
+                links.append( (n+":B", "x", n+":E", "black", "r") )
+                node_size[n+":B"] = 15
+                node_size[n+":E"] = 15
+            else:
+                links.append( (n+":B", "x", n+":E", "#EEE", "r") )
             
+        
+        node_size[v.split(":")[0]+":B"] = 50
+        node_size[v.split(":")[0]+":E"] = 50
+
         for n, ctgs in get_ctg_of_nodes( list(all_nodes) ):
             node_ctg[n] = " / ".join(tuple(ctgs))
                 
@@ -190,7 +206,8 @@ class ShowLocalSG(tornado.web.RequestHandler):
         self.write( json.dumps({"links":links, 
                                 "node_to_ctg":node_ctg, 
                                 "ctg_list":sorted(list(neighbor_ctgs)),
-                                "center_node": v}) )
+                                "center_node": v,
+                                "node_size": node_size}) )
         #with open("graph_data.json","w") as f:
         #    print >>f, "var graph_data = {links:%s, node_to_ctg:%s, ctg_list:%s}" % (s1,s2,s3)
         #import os
